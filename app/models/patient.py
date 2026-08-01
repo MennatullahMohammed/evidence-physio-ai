@@ -1,7 +1,9 @@
 from dataclasses import dataclass
+
+
 @dataclass
-class patient:
-    working_diagnose: str
+class Patient:
+    working_diagnosis: str
     age: int
     sex: str
     occupation: str
