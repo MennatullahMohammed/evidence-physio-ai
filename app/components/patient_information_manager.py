@@ -160,7 +160,9 @@ class PatientInformationManager:
 
         self.normalize_patient_information()
         return self.create_patient_profile()
-    
+
+
+
 if __name__ == "__main__":
     # Sample raw data, as if it came from the UI.
     # Every field in the Patient dataclass must be present here,
