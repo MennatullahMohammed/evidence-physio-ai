@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from data.diagnosis_knowledge_base import DIAGNOSIS_KNOWLEDGE_BASE, DEFAULT_KNOWLEDGE_ENTRY
 from data.search_rules import SEARCH_RULES
 
@@ -60,23 +62,27 @@ class SearchStrategyBuilder:
 
     def construct_query(self):
         """
-        Step 4: Build the final PubMed query string using the keyword
-        block, personalization terms, and the fixed search rules.
+        Step 4: Build the final PubMed query string. The diagnosis terms
+        are the only mandatory part of the search. Personalization terms
+        are NOT included as a mandatory filter, because generic patient
+        attributes (like occupation or activity level) are rarely present
+        in a paper's title/abstract, and requiring them as AND conditions
+        tends to return zero results. They're kept on self for potential
+        future use (e.g. re-ranking results), but don't narrow the search.
+
+        Uses a real PubMed date-range tag (start:end[dp]) rather than a
+        plain-English phrase, since PubMed does not parse "last N years"
+        as text — it requires actual year boundaries.
         """
         # Diagnosis terms are joined with OR (any of them can match)
         diagnosis_part = " OR ".join(self.keyword_block)
+        query = f"({diagnosis_part})"
 
-        # Personalization terms are also joined with OR, and wrapped
-        # in AND with the diagnosis part, so they narrow the search.
-        if self.personalization_terms:
-            personalization_part = " OR ".join(self.personalization_terms)
-            query = f"({diagnosis_part}) AND ({personalization_part})"
-        else:
-            query = f"({diagnosis_part})"
-
-        # Add a publication year filter based on the search rules
+        # Add a publication year filter using a real date range
         years_limit = SEARCH_RULES["publication_years_limit"]
-        query += f" AND (last {years_limit} years[dp])"
+        current_year = datetime.now().year
+        start_year = current_year - years_limit
+        query += f" AND ({start_year}:{current_year}[dp])"
 
         self.query = query
         return self.query
@@ -96,6 +102,7 @@ class SearchStrategyBuilder:
         return self.construct_query()
 
 
+    
 if __name__ == "__main__":
     from app.models.patient import Patient
     from app.components.missing_clinical_information_engine import MissingClinicalInformationEngine
