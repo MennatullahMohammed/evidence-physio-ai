@@ -67,7 +67,7 @@ class PubMedRetrievalEngine:
                 "publication_year": self._get_text(article, ".//PubDate/Year"),
                 "abstract": self._get_text(article, ".//AbstractText"),
                 "doi": self._get_doi(article),
-                "publication_type": self._get_text(article, ".//PublicationType"),
+                "publication_type": self._get_publication_type(article),
             })
 
         return self.retrieved_evidence
@@ -94,6 +94,22 @@ class PubMedRetrievalEngine:
             if last_name is not None and first_name is not None:
                 authors.append(f"{first_name.text} {last_name.text}")
         return authors
+
+    def _get_publication_type(self, article):
+        """
+        Articles usually list multiple PublicationType tags (e.g. both
+        "Journal Article" and "Randomized Controlled Trial"). The generic
+        "Journal Article" tag appears on almost every article and isn't
+        useful for scoring, so it's skipped in favor of a more specific
+        type when one is present. Falls back to "Journal Article" if
+        that's the only type listed.
+        """
+        types = [el.text for el in article.findall(".//PublicationType") if el.text]
+        specific_types = [t for t in types if t.strip().lower() != "journal article"]
+
+        if specific_types:
+            return specific_types[0]
+        return types[0] if types else None
 
     def process(self, query, max_results=20):
         """
