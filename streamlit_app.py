@@ -2,8 +2,13 @@
 EvidencePhysio AI — Streamlit Interface
 ==========================================
 
-A simple web UI for entering patient data and viewing the generated
+A styled web UI for entering patient data and viewing the generated
 evidence report, built on top of the existing 10-component pipeline.
+No changes to component logic — this file only affects presentation.
+
+Overall color theme (light, primaryColor, etc.) is set in
+.streamlit/config.toml so native Streamlit widgets (inputs, dropdowns,
+slider, buttons) stay consistent with the custom elements below.
 """
 
 import streamlit as st
@@ -57,26 +62,280 @@ def placeholder_explanation(confidence_level, confidence_explanation):
 
 
 # --------------------------------------------------------------------------- #
-# Page setup
+# Page setup + design tokens
 # --------------------------------------------------------------------------- #
 
 st.set_page_config(page_title="EvidencePhysio AI", page_icon="🩺", layout="centered")
 
-st.title("🩺 EvidencePhysio AI")
-st.caption("AI-assisted evidence retrieval for physiotherapy clinical decisions")
+INK = "#1F2937"
+MUTED = "#6B7280"
+BORDER = "#E4E0D6"
+CARD = "#FFFFFF"
+PAGE = "#FAF8F3"
+ACCENT = "#2A9D8F"
+ACCENT_SOFT = "#EAF4F2"
+
+CONFIDENCE_COLORS = {
+    "high": "#16A34A",
+    "moderate": "#D97706",
+    "low": "#EA580C",
+    "very low": "#DC2626",
+}
+CONFIDENCE_WIDTH = {
+    "high": "100%",
+    "moderate": "70%",
+    "low": "40%",
+    "very low": "15%",
+}
 
 st.markdown(
-    "Enter a patient's clinical profile below. The system does **not** diagnose — "
-    "it retrieves and summarizes published evidence to support treatment planning."
+    f"""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+    html, body, [class*="css"] {{
+        font-family: 'Inter', sans-serif;
+    }}
+    h1, h2, h3 {{ font-family: 'Lora', serif !important; }}
+
+    .stApp {{
+        background-color: {PAGE};
+    }}
+
+    [data-testid="stHeader"] {{
+        background-color: {PAGE};
+    }}
+
+    .block-container {{
+        padding-top: 2.2rem;
+        max-width: 760px;
+    }}
+
+    label, .stMarkdown p {{
+        color: {INK} !important;
+    }}
+
+    .ep-hero {{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 2px;
+    }}
+    .ep-hero-icon {{ font-size: 32px; line-height: 1; }}
+    .ep-hero h1 {{
+        margin: 0;
+        font-size: 28px;
+        color: {INK};
+    }}
+    .ep-tagline {{
+        color: {MUTED};
+        font-size: 14px;
+        margin: 4px 0 18px 0;
+    }}
+    .ep-disclaimer {{
+        background: {ACCENT_SOFT};
+        border: 1px solid {BORDER};
+        border-left: 3px solid {ACCENT};
+        border-radius: 6px;
+        padding: 12px 16px;
+        color: #374151;
+        font-size: 13.5px;
+        line-height: 1.5;
+        margin-bottom: 30px;
+    }}
+
+    .ep-step {{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 34px 0 14px 0;
+    }}
+    .ep-step-num {{
+        background: {ACCENT};
+        color: #FFFFFF;
+        font-weight: 600;
+        font-size: 12px;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }}
+    .ep-step-title {{
+        font-family: 'Lora', serif;
+        font-weight: 600;
+        font-size: 18px;
+        color: {INK};
+    }}
+
+    [data-testid="stForm"] {{
+        background: {CARD};
+        border: 1px solid {BORDER};
+        border-radius: 12px;
+        padding: 22px 24px 8px 24px;
+    }}
+
+    .stTextInput input,
+    .stNumberInput input,
+    .stTextArea textarea {{
+        background: {PAGE} !important;
+        color: {INK} !important;
+        border: 1px solid {BORDER} !important;
+        border-radius: 8px !important;
+    }}
+    [data-baseweb="select"] > div,
+    [data-baseweb="select"] div[role="button"] {{
+        background-color: {PAGE} !important;
+        border: 1.5px solid {BORDER} !important;
+        border-radius: 8px !important;
+        color: {INK} !important;
+        box-shadow: none !important;
+    }}
+    [data-testid="stSelectbox"] > div > div {{
+        border: 1.5px solid {BORDER} !important;
+        border-radius: 8px !important;
+        background-color: {PAGE} !important;
+    }}
+    [data-baseweb="select"] span {{
+        color: {INK} !important;
+    }}
+    [data-baseweb="popover"] {{
+        background-color: {CARD} !important;
+    }}
+    [data-baseweb="menu"] {{
+        background-color: {CARD} !important;
+    }}
+    [data-baseweb="menu"] li {{
+        color: {INK} !important;
+        background-color: {CARD} !important;
+    }}
+    [data-baseweb="menu"] li:hover {{
+        background-color: {ACCENT_SOFT} !important;
+    }}
+    .stSlider [data-baseweb="slider"] {{
+        margin-top: 6px;
+    }}
+
+    .stButton > button,
+    .stDownloadButton > button,
+    button[kind="primary"],
+    button[kind="secondary"],
+    button[data-testid="baseButton-secondaryFormSubmit"] {{
+        background-color: {ACCENT} !important;
+        color: #FFFFFF !important;
+        font-weight: 600;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 10px 22px;
+    }}
+    .stButton > button:hover,
+    .stDownloadButton > button:hover,
+    button[kind="primary"]:hover,
+    button[kind="secondary"]:hover {{
+        background-color: #23897C !important;
+        color: #FFFFFF !important;
+    }}
+
+    .ep-card {{
+        background: {CARD};
+        border: 1px solid {BORDER};
+        border-radius: 10px;
+        padding: 16px 18px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 2px rgba(31, 41, 55, 0.04);
+    }}
+    .ep-card-title {{
+        color: {INK};
+        font-weight: 600;
+        font-size: 15px;
+        margin-bottom: 4px;
+        line-height: 1.4;
+    }}
+    .ep-card-meta {{
+        color: {MUTED};
+        font-size: 13px;
+    }}
+    .ep-score {{
+        display: inline-block;
+        background: {ACCENT_SOFT};
+        border: 1px solid {BORDER};
+        color: {ACCENT};
+        font-size: 12px;
+        font-weight: 600;
+        padding: 2px 10px;
+        border-radius: 20px;
+        margin-top: 8px;
+    }}
+
+    .ep-confidence-badge {{
+        display: inline-block;
+        font-family: 'Lora', serif;
+        font-weight: 600;
+        font-size: 22px;
+        padding: 2px 0 6px 0;
+    }}
+    .ep-confidence-track {{
+        background: {ACCENT_SOFT};
+        border: 1px solid {BORDER};
+        border-radius: 20px;
+        height: 10px;
+        width: 100%;
+        margin: 8px 0 10px 0;
+        overflow: hidden;
+    }}
+    .ep-confidence-fill {{ height: 100%; border-radius: 20px; }}
+    .ep-confidence-explain {{ color: {MUTED}; font-size: 13px; line-height: 1.5; }}
+
+    .ep-query {{
+        background: {ACCENT_SOFT};
+        border: 1px solid {BORDER};
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-family: 'SFMono-Regular', Consolas, monospace;
+        font-size: 12.5px;
+        color: #374151;
+        line-height: 1.6;
+        overflow-x: auto;
+    }}
+
+    [data-testid="stExpander"] {{
+        border: 1px solid {BORDER} !important;
+        border-radius: 8px !important;
+        background: {CARD} !important;
+    }}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    """
+    <div class="ep-hero">
+        <div class="ep-hero-icon">🩺</div>
+        <h1>EvidencePhysio AI</h1>
+    </div>
+    <div class="ep-tagline">AI-assisted evidence retrieval for physiotherapy clinical decisions</div>
+    <div class="ep-disclaimer">
+        This tool does <strong>not</strong> diagnose. It retrieves and summarizes published
+        evidence to support treatment planning — the physiotherapist makes the final call.
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
 
 # --------------------------------------------------------------------------- #
 # Input form
 # --------------------------------------------------------------------------- #
 
-with st.form("patient_form"):
-    st.subheader("Patient Information")
+st.markdown(
+    '<div class="ep-step"><div class="ep-step-num">1</div>'
+    '<div class="ep-step-title">Patient Information</div></div>',
+    unsafe_allow_html=True,
+)
 
+with st.form("patient_form"):
     col1, col2 = st.columns(2)
     with col1:
         working_diagnosis = st.text_input("Working diagnosis", "Rotator Cuff Tendinopathy")
@@ -99,6 +358,7 @@ with st.form("patient_form"):
         "Return to swimming",
     )
 
+    st.write("")
     submitted = st.form_submit_button("Generate Evidence Report")
 
 
@@ -215,7 +475,7 @@ if submitted:
     # Display results
     # ----------------------------------------------------------------- #
 
-    st.success("Report generated successfully!")
+    st.success("Report generated successfully")
 
     if used_fallback:
         st.info(
@@ -223,28 +483,92 @@ if submitted:
             "shown below to demonstrate the full pipeline."
         )
 
-    st.subheader("📋 Search Strategy")
-    st.code(query, language="text")
+    st.markdown(
+        '<div class="ep-step"><div class="ep-step-num">2</div>'
+        '<div class="ep-step-title">Search Strategy</div></div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(f'<div class="ep-query">{query}</div>', unsafe_allow_html=True)
 
-    st.subheader("📚 Selected Studies")
+    st.markdown(
+        '<div class="ep-step"><div class="ep-step-num">3</div>'
+        '<div class="ep-step-title">Selected Studies</div></div>',
+        unsafe_allow_html=True,
+    )
     for study in prioritized_evidence:
         st.markdown(
-            f"**{study['title']}**  \n"
-            f"{study['journal']} ({study['publication_year']}) — score: {study['relevance_score']}"
+            f"""
+            <div class="ep-card">
+                <div class="ep-card-title">{study['title']}</div>
+                <div class="ep-card-meta">{study['journal']} · {study['publication_year']}</div>
+                <div class="ep-score">relevance {study['relevance_score']}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
-    st.subheader("📊 Evidence Confidence")
-    st.metric("Confidence Level", confidence_result["confidence_level"].title())
-    st.caption(confidence_result["explanation"])
+    st.markdown(
+        '<div class="ep-step"><div class="ep-step-num">4</div>'
+        '<div class="ep-step-title">Evidence Confidence</div></div>',
+        unsafe_allow_html=True,
+    )
+    level = confidence_result["confidence_level"].lower()
+    color = CONFIDENCE_COLORS.get(level, MUTED)
+    width = CONFIDENCE_WIDTH.get(level, "50%")
+    st.markdown(
+        f"""
+        <div class="ep-card">
+            <span class="ep-confidence-badge" style="color:{color};">
+                {confidence_result['confidence_level'].title()}
+            </span>
+            <div class="ep-confidence-track">
+                <div class="ep-confidence-fill" style="width:{width}; background:{color};"></div>
+            </div>
+            <div class="ep-confidence-explain">{confidence_result['explanation']}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-    st.subheader("🧾 Patient-Specific Summary")
-    st.write(patient_specific_summary)
+    st.markdown(
+        '<div class="ep-step"><div class="ep-step-num">5</div>'
+        '<div class="ep-step-title">Patient-Specific Summary</div></div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(f'<div class="ep-card">{patient_specific_summary}</div>', unsafe_allow_html=True)
 
-    st.subheader("💬 Natural Language Explanation")
-    st.write(natural_language_explanation)
+    st.markdown(
+        '<div class="ep-step"><div class="ep-step-num">6</div>'
+        '<div class="ep-step-title">Natural Language Explanation</div></div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(f'<div class="ep-card">{natural_language_explanation}</div>', unsafe_allow_html=True)
 
-    st.subheader("📥 Full Report")
-    st.text_area("Human-readable report", final_result["human_readable_report"], height=300)
+    st.markdown(
+        '<div class="ep-step"><div class="ep-step-num">7</div>'
+        '<div class="ep-step-title">Full Report</div></div>',
+        unsafe_allow_html=True,
+    )
+    with st.expander("View the report"):
+        st.markdown(f"**Working diagnosis:** {patient.working_diagnosis}")
+        st.markdown(f"**Age / Sex:** {patient.age} · {patient.sex}")
+        st.markdown(f"**Pain severity (NRS):** {patient.pain_severity}/10")
+        st.markdown(f"**Functional limitations:** {', '.join(patient.functional_limitations) or 'None reported'}")
+        st.markdown(f"**Patient goals:** {', '.join(patient.patient_goals) or 'None reported'}")
+
+        st.markdown("---")
+        st.markdown("**References**")
+        for study in prioritized_evidence:
+            authors = ", ".join(study.get("authors", [])[:3]) or "Authors not listed"
+            doi = study.get("doi")
+            doi_line = f" · DOI: {doi}" if doi else ""
+            st.markdown(
+                f"- *{study['title']}* — {authors}. "
+                f"{study['journal']} ({study['publication_year']}){doi_line}  \n"
+                f"  PubMed ID: {study['pmid']}"
+            )
+
+    st.write("")
     st.download_button(
         "Download JSON Report",
         data=final_result["json_report"],
