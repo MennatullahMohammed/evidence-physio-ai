@@ -5,18 +5,29 @@
 
 DIAGNOSIS_KNOWLEDGE_BASE = {
     "rotator cuff tendinopathy": {
-        "checklist": [
-            "onset",
-            "mechanism_of_injury",
-            "pain_irritability",
-            "active_rom",
-            "special_tests",
-            "occupational_demands",
-        ],
-        "keywords": ["rotator cuff tendinopathy", "shoulder impingement"],
-        "synonyms": ["supraspinatus tendinopathy", "rotator cuff tendinitis"],
-        "mesh_terms": ["Rotator Cuff Injuries", "Tendinopathy"],
-        "personalization_fields": ["occupation", "activity_level", "dominant_side"],
+    "checklist": [
+        "onset",
+        "mechanism_of_injury",
+        "pain_irritability",
+        "active_rom",
+        "special_tests",
+        "occupational_demands",
+    ],
+    "keywords": [
+        "rotator cuff tendinopathy",
+        "shoulder impingement",
+        "subacromial impingement",
+    ],
+    "synonyms": [
+        "supraspinatus tendinopathy",
+        "rotator cuff tendinitis",
+        "shoulder tendinopathy",
+    ],
+    "mesh_terms": [
+        "Rotator Cuff Injuries",
+        "Shoulder Impingement Syndrome",
+    ],
+    "personalization_fields": ["occupation", "activity_level", "dominant_side"],
     },
     "low back pain": {
         "checklist": [
@@ -28,8 +39,8 @@ DIAGNOSIS_KNOWLEDGE_BASE = {
             "functional_limitations",
         ],
         "keywords": ["low back pain", "lumbar pain"],
-        "synonyms": ["lumbago", "non-specific low back pain"],
-        "mesh_terms": ["Low Back Pain", "Lumbosacral Region"],
+        "synonyms": ["non-specific low back pain"],
+        "mesh_terms": ["Lumbosacral Region"],
         "personalization_fields": ["occupational_demands", "yellow_flags", "activity_level"],
     },
     # Add more diagnoses here as needed.
